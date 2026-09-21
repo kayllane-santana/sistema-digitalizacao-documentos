@@ -1,48 +1,65 @@
-// Array em memória para simular o armazenamento local de caixas cadastradas
-const caixasCadastradas = [];
+const API_URL = 'http://127.0.0.1:5000/api';
 
-// Seleção dos elementos do HTML
 const formCaixa = document.getElementById('form-caixa');
 const formEtapa = document.getElementById('form-etapa');
 const selectCaixa = document.getElementById('select-caixa');
 
-// 1. Evento para cadastrar uma nova caixa
-formCaixa.addEventListener('submit', function (event) {
-    event.preventDefault(); // Impede o recarregamento padrão da página
+// Carrega as caixas vindas do banco de dados ao abrir a página
+document.addEventListener('DOMContentLoaded', carregarCaixas);
+
+async function carregarCaixas() {
+    try {
+        const response = await fetch(`${API_URL}/caixas`);
+        if (!response.ok) throw new Error('Erro ao buscar caixas');
+        
+        const caixas = await response.json();
+        
+        selectCaixa.innerHTML = '<option value="">Selecione uma caixa...</option>';
+        caixas.forEach(caixa => {
+            const option = document.createElement('option');
+            option.value = caixa.id;
+            option.textContent = `${caixa.numero_caixa} - ${caixa.tipo_documento}`;
+            selectCaixa.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+// 1. Cadastrar Caixa via API REST
+formCaixa.addEventListener('submit', async function (event) {
+    event.preventDefault();
 
     const numeroCaixa = document.getElementById('numero-caixa').value;
     const tipoDocumento = document.getElementById('tipo-documento').value;
 
-    // Guardar no array local
-    const novaCaixa = {
-        id: Date.now(),
-        numero: numeroCaixa,
-        tipo: tipoDocumento
-    };
+    try {
+        const response = await fetch(`${API_URL}/caixas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                numero_caixa: numeroCaixa,
+                tipo_documento: tipoDocumento
+            })
+        });
 
-    caixasCadastradas.push(novaCaixa);
+        const result = await response.json();
 
-    // Atualizar a lista do menu pendente (select) na segunda seção
-    atualizarSelectCaixas();
-
-    alert(`Caixa ${numeroCaixa} cadastrada com sucesso!`);
-    formCaixa.reset(); // Limpa os campos do formulário
+        if (response.ok) {
+            alert(result.mensagem);
+            formCaixa.reset();
+            carregarCaixas(); // Atualiza o menu suspenso
+        } else {
+            alert(`Erro: ${result.erro}`);
+        }
+    } catch (error) {
+        alert('Erro ao conectar com o servidor Python!');
+        console.error(error);
+    }
 });
 
-// Função para preencher o menu pendente de caixas dinamicamente
-function atualizarSelectCaixas() {
-    selectCaixa.innerHTML = '<option value="">Selecione uma caixa...</option>';
-
-    caixasCadastradas.forEach(caixa => {
-        const option = document.createElement('option');
-        option.value = caixa.id;
-        option.textContent = `${caixa.numero} - ${caixa.tipo}`;
-        selectCaixa.appendChild(option);
-    });
-}
-
-// 2. Evento para registrar a etapa do processo
-formEtapa.addEventListener('submit', function (event) {
+// 2. Registrar Etapa com Upload de PDF via FormData
+formEtapa.addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const caixaId = selectCaixa.value;
@@ -55,15 +72,30 @@ formEtapa.addEventListener('submit', function (event) {
         return;
     }
 
-    const nomeArquivo = arquivoPdf ? arquivoPdf.name : 'Nenhum arquivo anexado';
+    const formData = new FormData();
+    formData.append('caixa_id', caixaId);
+    formData.append('etapa', etapa);
+    formData.append('qtd_folhas', qtdFolhas);
+    if (arquivoPdf) {
+        formData.append('pdf', arquivoPdf);
+    }
 
-    console.log('Registro Salvo:', {
-        caixaId,
-        etapa,
-        qtdFolhas,
-        arquivo: nomeArquivo
-    });
+    try {
+        const response = await fetch(`${API_URL}/etapas`, {
+            method: 'POST',
+            body: formData
+        });
 
-    alert(`Etapa de ${etapa} registrada com sucesso!\nFolhas: ${qtdFolhas}\nArquivo: ${nomeArquivo}`);
-    formEtapa.reset();
-});
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.mensagem);
+            formEtapa.reset();
+        } else {
+            alert(`Erro: ${result.erro}`);
+        }
+    } catch (error) {
+        alert('Erro ao enviar etapa para o servidor!');
+        console.error(error);
+    }
+}); 
