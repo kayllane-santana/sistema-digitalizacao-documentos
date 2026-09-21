@@ -84,3 +84,17 @@ body {
 .btn-success:hover {
     background-color: #15803d;
 }
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.radio-group label {
+    font-weight: normal; /* Deixa o nome dos funcionários sem negrito */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}

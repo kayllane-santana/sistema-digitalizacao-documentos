@@ -14,18 +14,54 @@
 <main class="container">
     <!-- Formulário de Registro de Lote/Caixa -->
     <section class="card">
-        <h2>1. Registrar Nova Caixa/Lote</h2>
-        <form id="form-caixa">
-            <div class="form-group">
-                <label for="numero-caixa">Número da Caixa:</label>
-                <input type="text" id="numero-caixa" placeholder="Ex: 053918" required>
+         <h2>1. Registrar Nova Caixa/Lote</h2>
+    <form id="form-caixa">
+
+        <!-- 1. Data do Registro -->
+        <div class="form-group">
+            <label for="data-registro">Data de Registro:</label>
+            <input type="date" id="data-registro" required>
+        </div>
+
+        <!-- 2. Seleção do Funcionário (Bolinhas de Seleção / Radio Buttons) -->
+        <div class="form-group">
+            <label>Funcionário Responsável:</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="funcionario" value="Carlos Silva" required>
+                    Carlos Silva
+                </label>
+                <label>
+                    <input type="radio" name="funcionario" value="Ana Souza">
+                    Ana Souza
+                </label>
+                <label>
+                    <input type="radio" name="funcionario" value="Kayllane Santana">
+                    Kayllane Santana
+                </label>
             </div>
-            <div class="form-group">
-                <label for="tipo-documento">Tipo de Documento:</label>
-                <input type="text" id="tipo-documento" placeholder="Ex: lista de presença, requerimento" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Cadastrar Caixa</button>
-        </form>
+        </div>
+
+        <!-- 3. Hora de Início -->
+        <div class="form-group">
+            <label for="hora-inicio">Hora de Início:</label>
+            <input type="time" id="hora-inicio" required>
+        </div>
+
+        <!-- 4. Número da Caixa -->
+        <div class="form-group">
+            <label for="numero-caixa">Número da Caixa:</label>
+            <input type="text" id="numero-caixa" placeholder="Ex: CX-2026-001" required>
+        </div>
+
+        <!-- 5. Tipo de Documento -->
+        <div class="form-group">
+            <label for="tipo-documento">Tipo de Documento:</label>
+            <input type="text" id="tipo-documento" placeholder="Ex: Prontuários, Contratos" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cadastrar Caixa</button>
+    </form>
     </section>
 
     <!-- Controle de Etapa Operacional -->
